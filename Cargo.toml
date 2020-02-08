@@ -1,0 +1,26 @@
+[package]
+name = "rood"
+version = "0.1.0"
+authors = ["William Dussault <dalloriam@gmail.com>", "Purposed"]
+edition = "2018"
+license-file = "LICENSE"
+description = "General & configurable tools library for Purposed projects"
+repository = "https://github.com/purposed/rood"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["minimal"]
+
+full = ["light"]
+light = ["minimal", "serialization"]
+minimal = ["cli", "errors", "sys"]
+
+cli = ["colored"]
+errors = []
+sys = []
+serialization = ["serde"]
+
+[dependencies]
+colored = {version = "1.9.0", optional = true }
+serde = { version = "1.0.104", features = ["derive"], optional = true }
