@@ -11,9 +11,9 @@ fn make_padding(length: i32) -> String {
     let mut pad = String::new();
 
     if length > 0 {
-        pad = String::from("|");
+        pad = String::new();
         for _ in 0..length {
-            pad = pad.add(" ");
+            pad = pad.add("|   ");
         }
     }
     pad
@@ -42,7 +42,7 @@ impl OutputManager {
     pub fn with_padding(&self, padding: i32) -> OutputManager {
         OutputManager{
             verbose: self.verbose,
-            padding: self.padding+1
+            padding
         }
     }
 
