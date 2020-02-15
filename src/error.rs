@@ -1,6 +1,7 @@
 use std::error::Error as IError;
 use std::fmt;
 use std::io;
+use std::time;
 
 #[derive(Debug, PartialEq)]
 pub enum Cause {
@@ -18,6 +19,7 @@ pub enum Cause {
 
     // Application Errors
     IOError,
+    TimeError,
 
     GeneralError(String),
 }
@@ -49,6 +51,12 @@ impl IError for Error {}
 impl From<io::Error> for Error {
     fn from(v: io::Error) -> Error {
         Error::new(Cause::IOError, &format!("{}", v))
+    }
+}
+
+impl From<time::SystemTimeError> for Error {
+    fn from(v: time::SystemTimeError) -> Error {
+        Error::new(Cause::TimeError, &format!("{}", v))
     }
 }
 
