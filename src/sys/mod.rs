@@ -1,5 +1,10 @@
 mod architecture;
+/// File-related utilities.
+///
+/// Most utilities defined in this module are higher-level abstractions over `std::fs`, but common
+/// operations nonetheless.
 pub mod file;
+
 mod platform;
 
 pub use architecture::Architecture;

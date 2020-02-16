@@ -3,30 +3,45 @@ use std::fmt;
 use std::io;
 use std::time;
 
+/// Possible error causes. Useful for handling various failures from the code without having too much detail.
 #[derive(Debug, PartialEq)]
 pub enum Cause {
-    // Existence issues.
     AlreadyExists,
     NotFound,
 
-    // Concurrency.
+    /// Error thrown when encountering an invalid state in a concurrent situation.
+    /// *e.g.* when awaiting a stopped thread.
     ConcurrencyError,
 
-    // User-related errors.
+    /// User-input related error. Return this when processing invalid user data.
     InvalidData,
+
+    /// Return `InvalidState` when an operation fails due to a corrupt state. Recovery is often impossible.
     InvalidState,
+
+    /// Return when encoutering issues serializing / deserializing data.
     SerializationError,
 
-    // Application Errors
+    /// Returned by `From<std::io::Error> for rood::Error`.
     IOError,
+
+    /// Returned by `From<std::time::SystemTimeError> for rood::Error`.
     TimeError,
 
+    /// Used to encapsulate errors from other crates and/or errors not well defined here.
     GeneralError(String),
 }
 
+/// `Error` is a general error type used for failures in components of the Rood library, as well
+/// as by most purposed tools.
+///
+/// It can be converted implicitly from an `std::io::Error` and from a `std::Time::SystemTimeError`.
 #[derive(Debug)]
 pub struct Error {
+    /// The cause of the error.
     pub cause: Cause,
+
+    /// Additional information regarding the error.
     pub message: String,
 }
 
@@ -60,4 +75,7 @@ impl From<time::SystemTimeError> for Error {
     }
 }
 
+/// `CausedResult<T>` is a type alias for `Result<T, Error>`.
+///
+/// It is mostly used to shorten function declarations across the purposed codebase.
 pub type CausedResult<T> = Result<T, Error>;

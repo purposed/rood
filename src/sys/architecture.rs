@@ -3,6 +3,7 @@ use std::fmt;
 #[cfg(feature = "serialization")]
 use serde::{Deserialize, Serialize};
 
+/// Enum describing processor architectures.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serialization", serde(rename_all = "lowercase"))]

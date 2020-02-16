@@ -23,30 +23,62 @@ fn make_padding(length: i32) -> String {
     pad
 }
 
+/// The OutputManager is a nice wrapper over shell i/o functions.
+///
+/// It provides output nesting, various log levels and verbosity levels, as well as stack-like features
+/// for controlling more easily the indentation level of the output
+///
+/// # Examples
+/// ## Simple usage and stacked usage.
+/// ```
+/// use rood::cli::OutputManager;
+///
+/// let verbose_mode = false;
+/// let output = OutputManager::new(verbose_mode);
+/// output.step("[Step 1]");
+/// output.push().debug("Some indented verbose-only message");
+/// output.success("[Step 1] - OK")
+/// ```
+///
+/// ## Using a Yes/No prompt and handling errors.
+/// ```
+/// use rood::cli::OutputManager;
+///
+/// let output = OutputManager::new(false);
+/// match output.prompt_yn("Really to quit?", false) {
+///     Ok(val) => output.success(&format!("User picked: {}", val)),
+///     Err(e) => output.error(&format!("Error: {}", e))
+/// }
+/// ```
 pub struct OutputManager {
     pub verbose: bool,
-    padding: i32
+    padding: i32,
 }
 
 impl OutputManager {
+    /// Returns an `OutputManager` of the specified verbosity.
     pub fn new(verbose: bool) -> OutputManager {
-        OutputManager{
+        OutputManager {
             verbose,
-            padding: 0
+            padding: 0,
         }
     }
 
+    /// Returns a **new** `OutputManager` with the same verbosity level, but with an indentation
+    /// level incremented by one.
     pub fn push(&self) -> OutputManager {
-        OutputManager{
+        OutputManager {
             verbose: self.verbose,
-            padding: self.padding+1
+            padding: self.padding + 1,
         }
     }
 
+    /// Returns a **new** `OutputManager` with the same verbosity level, but with an indentation
+    /// level set to the level specified.
     pub fn with_padding(&self, padding: i32) -> OutputManager {
-        OutputManager{
+        OutputManager {
             verbose: self.verbose,
-            padding
+            padding,
         }
     }
 
@@ -68,32 +100,47 @@ impl OutputManager {
         print!("{}{} {}", pad, prefix_marker, msg);
     }
 
+    /// Displays a step. `msg` will be printed in yellow, prefixed by a `+`.
     pub fn step(&self, msg: &str) {
         self.print(msg.yellow(), STEP_PREFIX_MARKER, false);
     }
 
+    /// Displays a progress message. ̀msg` will be printed in white without a prefix.
     pub fn progress(&self, msg: &str) {
         self.print(ColoredString::from(msg), NO_PREFIX, false);
     }
 
+    /// Displays a success message. `msg` will be printed in green, prefixed by a '+'.
     pub fn success(&self, msg: &str) {
         self.print(msg.green(), STEP_PREFIX_MARKER, false);
     }
 
+    /// Displays a debug message. `msg` will be printed in blue, prefixed by a '-'.
+    /// *Note: Debug messages are only printed when the verbose flag is set.*
     pub fn debug(&self, msg: &str) {
         self.print(msg.blue(), DEBUG_PREFIX_MARKER, true);
     }
 
+    /// Displays an error message. `msg` will be printed in red, prefixed by a '!'.
     pub fn error(&self, msg: &str) {
         self.print(msg.red(), ERROR_PREFIX_MARKER, false);
     }
 
+    /// Displays a yes/no prompt. `msg` will be printed in blue, prefixed by a '?'.
+    /// Will wait for user input before returning what the user selected.
     pub fn prompt_yn(&self, msg: &str, default: bool) -> CausedResult<bool> {
         if default {
-            self.print_sameline(format!("{} [Y/n] - ", msg).blue(), QUESTION_PREFIX_MARKER, false);
-        }
-        else {
-            self.print_sameline(format!("{} [y/N] - ", msg).blue(), QUESTION_PREFIX_MARKER, false);
+            self.print_sameline(
+                format!("{} [Y/n] - ", msg).blue(),
+                QUESTION_PREFIX_MARKER,
+                false,
+            );
+        } else {
+            self.print_sameline(
+                format!("{} [y/N] - ", msg).blue(),
+                QUESTION_PREFIX_MARKER,
+                false,
+            );
         }
         let mut user_input = String::new();
         stdout().flush()?;
@@ -106,6 +153,4 @@ impl OutputManager {
             Ok(&user_pick == "y")
         }
     }
-
 }
-

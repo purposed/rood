@@ -9,6 +9,17 @@ use std::os::unix::fs::PermissionsExt;
 
 use crate::{Cause, CausedResult, Error};
 
+/// Checks for existence of the provided path, returning an error in case it doesn't exist.
+///
+/// Mostly a convenient wrapper for spawning consistent [Error](../../error/struct.Error.html) instances
+/// when checking for path existence.
+///
+/// # Examples
+/// ```
+/// use rood::sys::file;
+/// let result = file::ensure_exists("/non_existent_file.txt");
+/// assert!(result.is_err());
+/// ```
 pub fn ensure_exists<T>(raw: T) -> CausedResult<()>
 where
     T: AsRef<Path>,
@@ -25,7 +36,25 @@ where
     }
 }
 
-pub fn make_executable<T>(p: T) -> Result<(), io::Error> where T: AsRef<Path> {
+/// Mark the specified file as executable.
+///
+/// On unix systems, the implementation will be equivalent to `chmod +x {p}`.
+///
+/// *Note: Does nothing for now on Windows.*
+///
+/// # Examples
+/// ```
+/// use rood::sys::file;
+/// use std::fs::File;
+///
+/// let file_name = "myfile.sh";
+/// let file_handle = File::create(file_name).unwrap();
+/// file::make_executable(file_name).unwrap();
+/// ```
+pub fn make_executable<T>(p: T) -> Result<(), io::Error>
+where
+    T: AsRef<Path>,
+{
     if cfg!(unix) {
         // TODO: Actually only add +x flag, nothing else.
         let mut perms = fs::metadata(p.as_ref())?.permissions();
@@ -35,6 +64,27 @@ pub fn make_executable<T>(p: T) -> Result<(), io::Error> where T: AsRef<Path> {
     Ok(())
 }
 
+/// Replace all instances of a pattern in file.
+///
+/// Will read the file into memory, and will replace every instance of the provided pattern before
+/// writing back the buffer to the file.
+///
+/// # Examples
+/// ```
+/// use std::fs;
+/// use rood::sys::file;
+/// use std::io::Write;
+///
+/// let file_name = "myfile.txt";
+///
+/// // Create a file named "myfile.txt" and write some text to it.
+/// fs::File::create(file_name).unwrap().write_all(b"Hello there world. Hello again.").unwrap();
+///
+/// // Use replace_all to replace all instances of "Hello" by "Goodbye".
+/// file::replace_all(file_name, "Hello", "Goodbye").unwrap();
+///
+/// assert!(!fs::read_to_string(file_name).unwrap().contains("Hello"));
+/// ```
 pub fn replace_all<T>(p: T, pattern: &str, to: &str) -> CausedResult<()>
 where
     T: AsRef<Path>,

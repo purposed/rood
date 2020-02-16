@@ -3,6 +3,7 @@ use std::fmt;
 #[cfg(feature = "serialization")]
 use serde::{Deserialize, Serialize};
 
+/// Enum describing supported Purposed platforms.
 #[derive(Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serialization", derive(Deserialize, Serialize))]
 #[cfg_attr(feature = "serialization", serde(rename_all = "lowercase"))]
@@ -14,6 +15,9 @@ pub enum Platform {
 }
 
 impl Platform {
+    /// Detect the current platform.
+    ///
+    /// Defaults to `Platform::Unknown` if the platform is unsupported by the Rood library.
     pub fn detect() -> Platform {
         if cfg!(windows) {
             Platform::Windows
@@ -25,6 +29,8 @@ impl Platform {
             Platform::Unknown
         }
     }
+
+    /// Returns the platform formatted as string.
     pub fn value(&self) -> String {
         match &self {
             Platform::Windows => String::from("windows"),
