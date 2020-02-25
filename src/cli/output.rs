@@ -1,9 +1,10 @@
 use std::io::{stdin, stdout, Write};
 use std::ops::Add;
+use std::process::Command;
 
 use colored::*;
 
-use crate::CausedResult;
+use crate::{Cause, CausedResult, Error};
 
 static STEP_PREFIX_MARKER: &str = "+";
 static ERROR_PREFIX_MARKER: &str = "!";
@@ -126,6 +127,17 @@ impl OutputManager {
         self.print(msg.red(), ERROR_PREFIX_MARKER, false);
     }
 
+    /// Displays a prompt. `msg` will be printed in blue, prefixed by a '?'.
+    /// Will wait for user input before returning what the user typed.
+    pub fn prompt(&self, msg: &str) -> CausedResult<String> {
+        self.print_sameline(msg.blue(), QUESTION_PREFIX_MARKER, false);
+        let mut user_input = String::new();
+        stdout().flush()?;
+        stdin().read_line(&mut user_input)?;
+
+        Ok(String::from(user_input.trim()))
+    }
+
     /// Displays a yes/no prompt. `msg` will be printed in blue, prefixed by a '?'.
     /// Will wait for user input before returning what the user selected.
     pub fn prompt_yn(&self, msg: &str, default: bool) -> CausedResult<bool> {
@@ -151,6 +163,33 @@ impl OutputManager {
             Ok(&user_pick != "n")
         } else {
             Ok(&user_pick == "y")
+        }
+    }
+
+    pub fn clear(&self) -> CausedResult<()> {
+        if cfg!(unix) {
+            if !Command::new("clear").status()?.success() {
+                Err(Error::new(
+                    Cause::IOError,
+                    "Unknown error while clearing terminal",
+                ))
+            } else {
+                Ok(())
+            }
+        } else if cfg!(windows) {
+            if !Command::new("cls").status()?.success() {
+                Err(Error::new(
+                    Cause::IOError,
+                    "Unknown error while clearing terminal",
+                ))
+            } else {
+                Ok(())
+            }
+        } else {
+            Err(Error::new(
+                Cause::GeneralError(String::from("Unsupported")),
+                "Unsupported",
+            ))
         }
     }
 }

@@ -45,11 +45,12 @@ where
 /// # Examples
 /// ```
 /// use rood::sys::file;
-/// use std::fs::File;
+/// use std::fs;
 ///
 /// let file_name = "myfile.sh";
-/// let file_handle = File::create(file_name).unwrap();
+/// let file_handle = fs::File::create(file_name).unwrap();
 /// file::make_executable(file_name).unwrap();
+/// # fs::remove_file(file_name);
 /// ```
 pub fn make_executable<T>(p: T) -> Result<(), io::Error>
 where
@@ -84,6 +85,8 @@ where
 /// file::replace_all(file_name, "Hello", "Goodbye").unwrap();
 ///
 /// assert!(!fs::read_to_string(file_name).unwrap().contains("Hello"));
+///
+/// # fs::remove_file(file_name);
 /// ```
 pub fn replace_all<T>(p: T, pattern: &str, to: &str) -> CausedResult<()>
 where
