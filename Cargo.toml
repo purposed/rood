@@ -1,6 +1,6 @@
 [package]
 name = "rood"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["William Dussault <dalloriam@gmail.com>", "Purposed"]
 edition = "2018"
 license-file = "LICENSE"

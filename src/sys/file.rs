@@ -65,6 +65,15 @@ where
     Ok(())
 }
 
+pub fn is_executable<T: AsRef<Path>>(path: T) -> Result<bool, io::Error> {
+    if cfg!(unix) {
+        let perms = fs::metadata(path.as_ref())?.permissions();
+        Ok(perms.mode() & 0o111 != 0)
+    } else {
+        Ok(true)
+    }
+}
+
 /// Replace all instances of a pattern in file.
 ///
 /// Will read the file into memory, and will replace every instance of the provided pattern before

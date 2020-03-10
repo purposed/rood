@@ -1,3 +1,4 @@
+use std::env::consts;
 use std::fmt;
 
 #[cfg(feature = "serialization")]
@@ -10,23 +11,36 @@ use serde::{Deserialize, Serialize};
 pub enum Architecture {
     // TODO: Support more architectures.
     Amd64,
+    ARM,
 
     Unknown,
 }
 
 impl Architecture {
-    // TODO: Add architecture detection.
-    pub fn value(&self) -> String {
+    pub fn detect() -> Architecture {
+        match consts::ARCH {
+            "x86_64" => Architecture::Amd64,
+            "arm" => Architecture::ARM,
+            _ => Architecture::Unknown,
+        }
+    }
+
+    pub fn value(&self) -> Vec<String> {
         match self {
-            Architecture::Amd64 => String::from("amd64"),
-            _ => String::from("unknown"),
+            Architecture::Amd64 => vec![
+                String::from("amd64"),
+                String::from("x64"),
+                String::from("x86_64"),
+            ],
+            Architecture::ARM => vec![String::from("arm")],
+            _ => vec![String::from("unknown")],
         }
     }
 }
 
 impl fmt::Display for Architecture {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.value())
+        write!(f, "{}", self.value().first().unwrap())
     }
 }
 
