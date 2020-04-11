@@ -7,8 +7,6 @@ use std::io::Write;
 #[cfg(target_family = "unix")]
 use std::os::unix::fs::PermissionsExt;
 
-use crate::{Cause, CausedResult, Error};
-
 /// Checks for existence of the provided path, returning an error in case it doesn't exist.
 ///
 /// Mostly a convenient wrapper for spawning consistent [Error](../../error/struct.Error.html) instances
@@ -20,7 +18,7 @@ use crate::{Cause, CausedResult, Error};
 /// let result = file::ensure_exists("/non_existent_file.txt");
 /// assert!(result.is_err());
 /// ```
-pub fn ensure_exists<T>(raw: T) -> CausedResult<()>
+pub fn ensure_exists<T>(raw: T) -> io::Result<()>
 where
     T: AsRef<Path>,
 {
@@ -29,9 +27,9 @@ where
     if path.exists() {
         Ok(())
     } else {
-        Err(Error::new(
-            Cause::NotFound,
-            &format!("Path [{}] does not exist", path.to_str().unwrap_or("")),
+        Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("Path [{}] does not exist", path.display()),
         ))
     }
 }
@@ -52,7 +50,7 @@ where
 /// file::make_executable(file_name).unwrap();
 /// # fs::remove_file(file_name);
 /// ```
-pub fn make_executable<T>(p: T) -> Result<(), io::Error>
+pub fn make_executable<T>(p: T) -> io::Result<()>
 where
     T: AsRef<Path>,
 {
@@ -65,7 +63,7 @@ where
     Ok(())
 }
 
-pub fn is_executable<T: AsRef<Path>>(path: T) -> Result<bool, io::Error> {
+pub fn is_executable<T: AsRef<Path>>(path: T) -> io::Result<bool> {
     if cfg!(unix) {
         let perms = fs::metadata(path.as_ref())?.permissions();
         Ok(perms.mode() & 0o111 != 0)
@@ -97,7 +95,7 @@ pub fn is_executable<T: AsRef<Path>>(path: T) -> Result<bool, io::Error> {
 ///
 /// # fs::remove_file(file_name);
 /// ```
-pub fn replace_all<T>(p: T, pattern: &str, to: &str) -> CausedResult<()>
+pub fn replace_all<T>(p: T, pattern: &str, to: &str) -> io::Result<()>
 where
     T: AsRef<Path>,
 {

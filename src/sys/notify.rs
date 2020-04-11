@@ -1,9 +1,8 @@
+use std::io;
 use std::process::Command;
 
-use crate::{Cause, CausedResult, Error};
-
 #[cfg(unix)]
-fn notify_impl(title: &str, message: &str) -> CausedResult<()> {
+fn notify_impl(title: &str, message: &str) -> io::Result<()> {
     let mut child_process = Command::new("notify-send")
         .arg(title)
         .arg(message)
@@ -11,9 +10,9 @@ fn notify_impl(title: &str, message: &str) -> CausedResult<()> {
     let exit_status = child_process.wait()?;
 
     if !exit_status.success() {
-        Err(Error::new(
-            Cause::InvalidState,
-            "Error executing notify-send",
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            "Non-zero status code when calling notify-send",
         ))
     } else {
         Ok(())
@@ -21,10 +20,10 @@ fn notify_impl(title: &str, message: &str) -> CausedResult<()> {
 }
 
 #[cfg(macos)]
-fn notify_impl(title: &str, message: &str) -> CausedResult<()> {
+fn notify_impl(title: &str, message: &str) -> io::Result<()> {
     unimplemented!();
 }
 
-pub fn send(title: &str, message: &str) -> CausedResult<()> {
+pub fn send(title: &str, message: &str) -> io::Result<()> {
     notify_impl(title, message)
 }

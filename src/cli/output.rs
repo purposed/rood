@@ -1,10 +1,9 @@
+use std::io;
 use std::io::{stdin, stdout, Write};
 use std::ops::Add;
 use std::process::Command;
 
 use colored::*;
-
-use crate::{Cause, CausedResult, Error};
 
 static STEP_PREFIX_MARKER: &str = "+";
 static ERROR_PREFIX_MARKER: &str = "!";
@@ -129,7 +128,7 @@ impl OutputManager {
 
     /// Displays a prompt. `msg` will be printed in blue, prefixed by a '?'.
     /// Will wait for user input before returning what the user typed.
-    pub fn prompt(&self, msg: &str) -> CausedResult<String> {
+    pub fn prompt(&self, msg: &str) -> io::Result<String> {
         self.print_sameline(msg.blue(), QUESTION_PREFIX_MARKER, false);
         let mut user_input = String::new();
         stdout().flush()?;
@@ -140,7 +139,7 @@ impl OutputManager {
 
     /// Displays a yes/no prompt. `msg` will be printed in blue, prefixed by a '?'.
     /// Will wait for user input before returning what the user selected.
-    pub fn prompt_yn(&self, msg: &str, default: bool) -> CausedResult<bool> {
+    pub fn prompt_yn(&self, msg: &str, default: bool) -> io::Result<bool> {
         if default {
             self.print_sameline(
                 format!("{} [Y/n] - ", msg).blue(),
@@ -166,30 +165,27 @@ impl OutputManager {
         }
     }
 
-    pub fn clear(&self) -> CausedResult<()> {
+    pub fn clear(&self) -> io::Result<()> {
         if cfg!(unix) {
             if !Command::new("clear").status()?.success() {
-                Err(Error::new(
-                    Cause::IOError,
-                    "Unknown error while clearing terminal",
+                Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "Failed to clear the terminal",
                 ))
             } else {
                 Ok(())
             }
         } else if cfg!(windows) {
             if !Command::new("cls").status()?.success() {
-                Err(Error::new(
-                    Cause::IOError,
-                    "Unknown error while clearing terminal",
+                Err(io::Error::new(
+                    io::ErrorKind::Other,
+                    "Failed to clear the terminal",
                 ))
             } else {
                 Ok(())
             }
         } else {
-            Err(Error::new(
-                Cause::GeneralError(String::from("Unsupported")),
-                "Unsupported",
-            ))
+            Err(io::Error::new(io::ErrorKind::Other, "Unsupported platform"))
         }
     }
 }
