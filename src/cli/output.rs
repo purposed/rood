@@ -50,6 +50,7 @@ fn make_padding(length: i32) -> String {
 ///     Err(e) => output.error(&format!("Error: {}", e))
 /// }
 /// ```
+#[derive(Clone)]
 pub struct OutputManager {
     pub verbose: bool,
     padding: i32,
