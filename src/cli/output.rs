@@ -4,6 +4,7 @@ use std::ops::Add;
 use std::process::Command;
 
 use colored::*;
+use rpassword;
 
 static STEP_PREFIX_MARKER: &str = "+";
 static ERROR_PREFIX_MARKER: &str = "!";
@@ -164,6 +165,16 @@ impl OutputManager {
         } else {
             Ok(&user_pick == "y")
         }
+    }
+
+    /// Displays a prompt for a password or any sensitive information. `msg` will be printed in blue, prefixed by a '?'.
+    /// Will wait for user input before returning what the user typed.
+    pub fn prompt_password<S: AsRef<str>>(&self, msg: S) -> io::Result<String> {
+        self.print_sameline(msg.as_ref().blue(), QUESTION_PREFIX_MARKER, false);
+        stdout().flush()?;
+        let user_input = rpassword::read_password()?;
+
+        Ok(String::from(user_input))
     }
 
     pub fn clear(&self) -> io::Result<()> {
