@@ -101,35 +101,35 @@ impl OutputManager {
     }
 
     /// Displays a step. `msg` will be printed in yellow, prefixed by a `+`.
-    pub fn step(&self, msg: &str) {
-        self.print(msg.yellow(), STEP_PREFIX_MARKER, false);
+    pub fn step<S: AsRef<str>>(&self, msg: S) {
+        self.print(msg.as_ref().yellow(), STEP_PREFIX_MARKER, false);
     }
 
     /// Displays a progress message. ̀msg` will be printed in white without a prefix.
-    pub fn progress(&self, msg: &str) {
-        self.print(ColoredString::from(msg), NO_PREFIX, false);
+    pub fn progress<S: AsRef<str>>(&self, msg: S) {
+        self.print(ColoredString::from(msg.as_ref()), NO_PREFIX, false);
     }
 
     /// Displays a success message. `msg` will be printed in green, prefixed by a '+'.
-    pub fn success(&self, msg: &str) {
-        self.print(msg.green(), STEP_PREFIX_MARKER, false);
+    pub fn success<S: AsRef<str>>(&self, msg: S) {
+        self.print(msg.as_ref().green(), STEP_PREFIX_MARKER, false);
     }
 
     /// Displays a debug message. `msg` will be printed in blue, prefixed by a '-'.
     /// *Note: Debug messages are only printed when the verbose flag is set.*
-    pub fn debug(&self, msg: &str) {
-        self.print(msg.blue(), DEBUG_PREFIX_MARKER, true);
+    pub fn debug<S: AsRef<str>>(&self, msg: S) {
+        self.print(msg.as_ref().blue(), DEBUG_PREFIX_MARKER, true);
     }
 
     /// Displays an error message. `msg` will be printed in red, prefixed by a '!'.
-    pub fn error(&self, msg: &str) {
-        self.print(msg.red(), ERROR_PREFIX_MARKER, false);
+    pub fn error<S: AsRef<str>>(&self, msg: S) {
+        self.print(msg.as_ref().red(), ERROR_PREFIX_MARKER, false);
     }
 
     /// Displays a prompt. `msg` will be printed in blue, prefixed by a '?'.
     /// Will wait for user input before returning what the user typed.
-    pub fn prompt(&self, msg: &str) -> io::Result<String> {
-        self.print_sameline(msg.blue(), QUESTION_PREFIX_MARKER, false);
+    pub fn prompt<S: AsRef<str>>(&self, msg: S) -> io::Result<String> {
+        self.print_sameline(msg.as_ref().blue(), QUESTION_PREFIX_MARKER, false);
         let mut user_input = String::new();
         stdout().flush()?;
         stdin().read_line(&mut user_input)?;
@@ -139,16 +139,16 @@ impl OutputManager {
 
     /// Displays a yes/no prompt. `msg` will be printed in blue, prefixed by a '?'.
     /// Will wait for user input before returning what the user selected.
-    pub fn prompt_yn(&self, msg: &str, default: bool) -> io::Result<bool> {
+    pub fn prompt_yn<S: AsRef<str>>(&self, msg: S, default: bool) -> io::Result<bool> {
         if default {
             self.print_sameline(
-                format!("{} [Y/n] - ", msg).blue(),
+                format!("{} [Y/n] - ", msg.as_ref()).blue(),
                 QUESTION_PREFIX_MARKER,
                 false,
             );
         } else {
             self.print_sameline(
-                format!("{} [y/N] - ", msg).blue(),
+                format!("{} [y/N] - ", msg.as_ref()).blue(),
                 QUESTION_PREFIX_MARKER,
                 false,
             );
