@@ -166,6 +166,16 @@ impl OutputManager {
         }
     }
 
+    /// Displays a prompt for a password or any sensitive information. `msg` will be printed in blue, prefixed by a '?'.
+    /// Will wait for user input before returning what the user typed.
+    pub fn prompt_password<S: AsRef<str>>(&self, msg: S) -> io::Result<String> {
+        self.print_sameline(msg.as_ref().blue(), QUESTION_PREFIX_MARKER, false);
+        stdout().flush()?;
+        let user_input = rpassword::read_password()?;
+
+        Ok(String::from(user_input))
+    }
+
     pub fn clear(&self) -> io::Result<()> {
         if cfg!(unix) {
             if !Command::new("clear").status()?.success() {
