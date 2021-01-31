@@ -4,7 +4,6 @@ use std::ops::Add;
 use std::process::Command;
 
 use colored::*;
-use rpassword;
 
 static STEP_PREFIX_MARKER: &str = "+";
 static ERROR_PREFIX_MARKER: &str = "!";
