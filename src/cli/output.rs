@@ -1,7 +1,8 @@
-use std::io;
-use std::io::{stdin, stdout, Write};
+use std::io::{self, stdin, stdout, Write};
 use std::ops::Add;
 use std::process::Command;
+
+use atty::Stream;
 
 use colored::*;
 
@@ -88,8 +89,13 @@ impl OutputManager {
             return;
         }
 
-        let pad = make_padding(self.padding);
-        println!("{}{} {}", pad, prefix_marker, msg);
+        if !atty::is(Stream::Stdout) {
+            let v: &str = &msg;
+            println!("{}", v);
+        } else {
+            let pad = make_padding(self.padding);
+            println!("{}{} {}", pad, prefix_marker, msg);
+        }
     }
 
     fn print_sameline(&self, msg: ColoredString, prefix_marker: &str, verbose_only: bool) {
@@ -97,8 +103,13 @@ impl OutputManager {
             return;
         }
 
-        let pad = make_padding(self.padding);
-        print!("{}{} {}", pad, prefix_marker, msg);
+        if !atty::is(Stream::Stdout) {
+            let v: &str = &msg;
+            print!("{}", v);
+        } else {
+            let pad = make_padding(self.padding);
+            print!("{}{} {}", pad, prefix_marker, msg);
+        }
     }
 
     /// Displays a step. `msg` will be printed in yellow, prefixed by a `+`.

@@ -16,12 +16,13 @@ full = ["light"]
 light = ["minimal", "serialization"]
 minimal = ["cli", "errors", "sys"]
 
-cli = ["colored"]
+cli = ["atty", "colored", "rpassword"]
 errors = []
 sys = []
 serialization = ["serde"]
 
 [dependencies]
-colored = {version = "2.0.0", optional = true }
-rpassword = "5.0"
+atty = { version = "0.2", optional = true }
+colored = { version = "2.0.0", optional = true }
+rpassword = { version = "5.0", optional = true }
 serde = { version = "1.0.104", features = ["derive"], optional = true }
