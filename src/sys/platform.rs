@@ -21,9 +21,9 @@ impl Platform {
     pub fn detect() -> Platform {
         if cfg!(windows) {
             Platform::Windows
-        } else if cfg!(unix) {
+        } else if cfg!(target_os = "linux") {
             Platform::Linux
-        } else if cfg!(macos) {
+        } else if cfg!(target_os = "macos") {
             Platform::Darwin
         } else {
             Platform::Unknown

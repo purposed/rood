@@ -11,7 +11,8 @@ use serde::{Deserialize, Serialize};
 pub enum Architecture {
     // TODO: Support more architectures.
     Amd64,
-    ARM,
+    Arm,
+    Arm64,
 
     Unknown,
 }
@@ -20,7 +21,8 @@ impl Architecture {
     pub fn detect() -> Architecture {
         match consts::ARCH {
             "x86_64" => Architecture::Amd64,
-            "arm" => Architecture::ARM,
+            "arm" => Architecture::Arm,
+            "aarch64" => Architecture::Arm64,
             _ => Architecture::Unknown,
         }
     }
@@ -32,7 +34,8 @@ impl Architecture {
                 String::from("x64"),
                 String::from("x86_64"),
             ],
-            Architecture::ARM => vec![String::from("arm")],
+            Architecture::Arm => vec![String::from("arm")],
+            &Architecture::Arm64 => vec![String::from("aarch64"), String::from("arm64")],
             _ => vec![String::from("unknown")],
         }
     }
@@ -48,6 +51,8 @@ impl From<&str> for Architecture {
     fn from(v: &str) -> Architecture {
         match v {
             "amd64" => Architecture::Amd64,
+            "arm" => Architecture::Arm,
+            "aarch64" => Architecture::Arm64,
             _ => Architecture::Unknown,
         }
     }
