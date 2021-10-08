@@ -184,7 +184,7 @@ impl OutputManager {
         stdout().flush()?;
         let user_input = rpassword::read_password()?;
 
-        Ok(String::from(user_input))
+        Ok(user_input)
     }
 
     pub fn clear(&self) -> io::Result<()> {

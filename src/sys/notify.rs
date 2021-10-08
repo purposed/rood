@@ -1,8 +1,9 @@
 use std::io;
-use std::process::Command;
 
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 fn notify_impl(title: &str, message: &str) -> io::Result<()> {
+    use std::process::Command;
+
     let mut child_process = Command::new("notify-send")
         .arg(title)
         .arg(message)
@@ -19,8 +20,8 @@ fn notify_impl(title: &str, message: &str) -> io::Result<()> {
     }
 }
 
-#[cfg(macos)]
-fn notify_impl(title: &str, message: &str) -> io::Result<()> {
+#[cfg(target_os = "macos")]
+fn notify_impl(_title: &str, _message: &str) -> io::Result<()> {
     unimplemented!();
 }
 

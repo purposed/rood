@@ -50,7 +50,7 @@ impl From<&str> for Platform {
     fn from(v: &str) -> Platform {
         match v {
             "windows" => Platform::Windows,
-            "darwin" => Platform::Darwin,
+            "darwin" | "macos" => Platform::Darwin,
             "linux" => Platform::Linux,
             _ => Platform::Unknown,
         }
