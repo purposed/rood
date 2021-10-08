@@ -31,18 +31,18 @@ impl Platform {
     }
 
     /// Returns the platform formatted as string.
-    pub fn value(&self) -> String {
+    pub fn value(&self) -> Vec<String> {
         match &self {
-            Platform::Windows => String::from("windows"),
-            Platform::Darwin => String::from("darwin"),
-            Platform::Linux => String::from("linux"),
-            Platform::Unknown => String::from("unknown"),
+            Platform::Windows => vec![String::from("windows")],
+            Platform::Darwin => vec![String::from("darwin"), String::from("macos")],
+            Platform::Linux => vec![String::from("linux")],
+            Platform::Unknown => vec![String::from("unknown")],
         }
     }
 }
 impl fmt::Display for Platform {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.value())
+        write!(f, "{}", self.value().first().unwrap())
     }
 }
 
