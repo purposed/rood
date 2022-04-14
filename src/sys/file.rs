@@ -34,6 +34,19 @@ where
     }
 }
 
+#[cfg(unix)]
+fn make_exec_impl(path: &Path) -> io::Result<()> {
+    // TODO: Actually only add +x flag, nothing else.
+    let mut perms = fs::metadata(p.as_ref())?.permissions();
+    perms.set_mode(0o755);
+    fs::set_permissions(p, perms)?;
+}
+
+#[cfg(windows)]
+fn make_exec_impl(_: &Path) -> io::Result<()> {
+    Ok(())
+}
+
 /// Mark the specified file as executable.
 ///
 /// On unix systems, the implementation will be equivalent to `chmod +x {p}`.
@@ -54,22 +67,17 @@ pub fn make_executable<T>(p: T) -> io::Result<()>
 where
     T: AsRef<Path>,
 {
-    if cfg!(unix) {
-        // TODO: Actually only add +x flag, nothing else.
-        let mut perms = fs::metadata(p.as_ref())?.permissions();
-        perms.set_mode(0o755);
-        fs::set_permissions(p, perms)?;
-    }
-    Ok(())
+    make_exec_impl(p.as_ref())
 }
 
-pub fn is_executable<T: AsRef<Path>>(path: T) -> io::Result<bool> {
-    if cfg!(unix) {
-        let perms = fs::metadata(path.as_ref())?.permissions();
-        Ok(perms.mode() & 0o111 != 0)
-    } else {
-        Ok(true)
+pub fn is_executable<T: AsRef<Path>>(_path: T) -> io::Result<bool> {
+    #[cfg(unix)]
+    {
+        let perms = fs::metadata(_path.as_ref())?.permissions();
+        return Ok(perms.mode() & 0o111 != 0);
     }
+
+    return Ok(true);
 }
 
 /// Replace all instances of a pattern in file.

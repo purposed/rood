@@ -25,6 +25,11 @@ fn notify_impl(_title: &str, _message: &str) -> io::Result<()> {
     unimplemented!();
 }
 
+#[cfg(target_os = "windows")]
+fn notify_impl(_title: &str, _message: &str) -> io::Result<()> {
+    unimplemented!();
+}
+
 pub fn send(title: &str, message: &str) -> io::Result<()> {
     notify_impl(title, message)
 }
