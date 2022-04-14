@@ -37,9 +37,10 @@ where
 #[cfg(unix)]
 fn make_exec_impl(path: &Path) -> io::Result<()> {
     // TODO: Actually only add +x flag, nothing else.
-    let mut perms = fs::metadata(p.as_ref())?.permissions();
+    let mut perms = fs::metadata(path)?.permissions();
     perms.set_mode(0o755);
-    fs::set_permissions(p, perms)?;
+    fs::set_permissions(path, perms)?;
+    Ok(())
 }
 
 #[cfg(windows)]
@@ -77,6 +78,7 @@ pub fn is_executable<T: AsRef<Path>>(_path: T) -> io::Result<bool> {
         return Ok(perms.mode() & 0o111 != 0);
     }
 
+    #[cfg(not(unix))]
     return Ok(true);
 }
 
